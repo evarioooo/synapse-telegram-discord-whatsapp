@@ -1,0 +1,59 @@
+services:
+
+  synapse:
+    image: docker.io/matrixdotorg/synapse:latest
+    container_name: synapse
+    restart: unless-stopped
+    volumes:
+      - /home/docker/container/matrix/synapse-data:/data
+    depends_on:
+      - db
+    ports:
+      - '127.0.0.1:8008:8008/tcp'
+
+  synapse-admin:
+    container_name: synapse-admin
+    hostname: synapse-admin
+    image: awesometechnologies/synapse-admin
+    ports:
+      - "8095:80"
+    environment:
+      - "REACT_APP_SERVER=https://matrix.evariooserver.de"
+    restart: unless-stopped
+
+  db:
+    container_name: synapse-db
+    image: docker.io/postgres:latest
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=synapse
+      - POSTGRES_INITDB_ARGS=--encoding='UTF8' --lc-collate='C' --lc-ctype='C'
+    volumes:
+      - /home/docker/container/matrix/postgres-data:/var/lib/postgresql/data
+
+  mautrix-whatsapp:
+    container_name: synapse-mautrix-whatsapp
+    image: dock.mau.dev/mautrix/whatsapp:latest
+    restart: unless-stopped
+    volumes:
+    - /home/docker/container/matrix/mautrix-whatsapp:/data
+
+  mautrix-telegram:
+    container_name: synapse-mautrix-telegram
+    image: dock.mau.dev/mautrix/telegram:latest
+    restart: unless-stopped
+    volumes:
+    - /home/docker/container/matrix/mautrix-telegram:/data
+
+  mautrix-discord:
+    container_name: synapse-mautrix-discord
+    image: dock.mau.dev/mautrix/discord:latest
+    restart: unless-stopped
+    volumes:
+    - /home/docker/container/matrix/mautrix-discord:/data
+
+networks:
+  default:
+    name: aqua
+    external: true
